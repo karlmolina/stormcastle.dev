@@ -1,0 +1,28 @@
+name: Deploy static content to cloudflare pages
+
+on:
+  # Runs on pushes targeting the default branch
+  push:
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  deploy-cloudflare:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      deployments: write
+    name: Deploy to Cloudflare Pages
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v4
+      - run: npm ci
+      - run: npm run build
+      - uses: cloudflare/pages-action@1
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: stormcastle.dev
+          directory: dist
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
